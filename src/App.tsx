@@ -39,7 +39,7 @@ const App = () => {
         Budgetary
       </h1>
 
-      <section className="gap-2">
+      <section>
         <h2 className="text-xl font-semibold text-slate-200">
           Add new account
         </h2>

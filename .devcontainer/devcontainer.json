@@ -6,7 +6,8 @@
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/schlich/devcontainer-features/powerlevel10k:1": {}
+    "ghcr.io/schlich/devcontainer-features/powerlevel10k:1": {},
+    "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {}
   }
 
   // Features to add to the dev container. More info: https://containers.dev/features.
