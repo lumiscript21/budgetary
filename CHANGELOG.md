@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0-alpha.0](https://github.com/lumiscript21/budgetary/compare/v0.0.1...v0.1.0-alpha.0) (2025-06-21)
+
 ### 0.0.1 (2025-06-21)
 
 
