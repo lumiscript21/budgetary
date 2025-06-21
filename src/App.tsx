@@ -12,14 +12,20 @@ interface FormValues {
 
 const formSchema = z.object({
   accountName: z.string().min(1, 'Account name is required'),
-  accountBalance: z.string().min(1, 'Account balance is required'),
+  accountBalance: z
+    .string()
+    .min(1, 'Account balance is required')
+    .refine((value) => !isNaN(Number(value)), {
+      message: 'Account balance must be a number',
+    })
+    .transform((value) => Number(value)),
 });
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
     <>
       {field.state.meta.isTouched && !field.state.meta.isValid ? (
-        <em className="text-red-300">
+        <em className="text-slate-400">
           {field.state.meta.errors?.[0]?.message}
         </em>
       ) : null}
@@ -37,7 +43,8 @@ const App = () => {
   const form = useForm({
     defaultValues: defaultValues,
     onSubmit: async ({ value }) => {
-      console.log('Form submitted with values:', value);
+      const parsed = formSchema.safeParse(value);
+      console.log('Form submitted with values:', parsed.data);
     },
     validators: {
       onChange: formSchema,
@@ -67,16 +74,16 @@ const App = () => {
               children={(field) => {
                 return (
                   <>
-                    <Label className="p-2 text-slate-300" htmlFor={field.name}>
+                    <Label className="text-slate-300" htmlFor={field.name}>
                       Account Name:
                     </Label>
                     <Input
+                      className="bg-slate-300"
                       id={field.name}
                       name={field.name}
-                      value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      className="bg-slate-300"
+                      value={field.state.value}
                     />
                     <FieldInfo field={field} />
                   </>
@@ -90,16 +97,17 @@ const App = () => {
               children={(field) => {
                 return (
                   <>
-                    <Label className="p-2 text-slate-300" htmlFor={field.name}>
+                    <Label className="text-slate-300" htmlFor={field.name}>
                       Account Balance:
                     </Label>
                     <Input
+                      className="bg-slate-300"
                       id={field.name}
                       name={field.name}
-                      value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      className="bg-slate-300"
+                      type="number"
+                      value={field.state.value}
                     />
                     <FieldInfo field={field} />
                   </>
