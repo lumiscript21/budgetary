@@ -53,8 +53,9 @@ const App = () => {
             accountBalance: String(parsed.data.accountBalance),
           },
         ]);
+
+        form.reset();
       }
-      console.log('Form submitted with values:', parsed.data);
     },
     validators: {
       onChange: accountSchema,

@@ -1,58 +1,69 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { beforeEach, describe, expect, it } from 'vitest';
 import App from '../App';
 
-describe('App', () => {
-  it('should render the app name', () => {
-    render(<App />);
+const accountName = () => screen.getByLabelText(/account name/i);
+const accountBalance = () => screen.getByLabelText(/account balance/i);
+const addButton = () => screen.getByRole('button', { name: /Add/i });
 
+describe('App', () => {
+  beforeEach(() => {
+    render(<App />);
+  });
+
+  it('should render the app name', () => {
     expect(
       screen.getByRole('heading', { name: /Budgetary/i }),
     ).toBeInTheDocument();
   });
 
   it('should render the form with budget account name and budget amount', () => {
-    render(<App />);
-
     expect(
       screen.getByRole('heading', { name: /Add new account/i }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/account name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/account balance/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Add/i })).toBeInTheDocument();
+    expect(accountName()).toBeInTheDocument();
+    expect(accountBalance()).toBeInTheDocument();
+    expect(addButton()).toBeInTheDocument();
   });
 
-  it('should display validation errors when fields are touched and invalid', async () => {
-    const user = userEvent.setup();
-    render(<App />);
+  describe('interacting with the form', () => {
+    let user: UserEvent;
+    beforeEach(() => {
+      user = userEvent.setup();
+    });
 
-    const addButton = screen.getByRole('button', { name: /Add/i });
+    it('should display validation errors when fields are touched and invalid', async () => {
+      const addButton = screen.getByRole('button', { name: /Add/i });
 
-    // Simulate form submission
-    await user.click(addButton);
+      await user.click(addButton);
 
-    const errors = screen.getAllByText(/is required/i);
+      const errors = screen.getAllByText(/is required/i);
 
-    // Check for validation messages
-    expect(errors).toHaveLength(2);
+      expect(errors).toHaveLength(2);
 
-    expect(errors[0]).toHaveTextContent(/account name is required/i);
-    expect(errors[1]).toHaveTextContent(/account balance is required/i);
+      expect(errors[0]).toHaveTextContent(/account name is required/i);
+      expect(errors[1]).toHaveTextContent(/account balance is required/i);
+    });
+
+    it('should clear the form fields after successful submission', async () => {
+      await user.type(accountName(), 'Test Account');
+      await user.type(accountBalance(), '1000');
+
+      await user.click(addButton());
+
+      expect(accountName()).toHaveTextContent('');
+      expect(accountBalance()).toHaveTextContent('');
+    });
   });
 
   it('should create an entry on the page if the form was submitted with valid data', async () => {
     const user = userEvent.setup();
-    render(<App />);
 
-    const accountNameInput = screen.getByLabelText(/account name/i);
-    const accountBalanceInput = screen.getByLabelText(/account balance/i);
-    const addButton = screen.getByRole('button', { name: /Add/i });
+    await user.type(accountName(), 'Test Account');
+    await user.type(accountBalance(), '1000');
 
-    await user.type(accountNameInput, 'Test Account');
-    await user.type(accountBalanceInput, '1000');
-
-    await user.click(addButton);
+    await user.click(addButton());
 
     expect(screen.getByText(/test account/i)).toBeInTheDocument();
   });
