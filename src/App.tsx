@@ -1,27 +1,41 @@
 import { useForm, type AnyFieldApi } from '@tanstack/react-form';
 import './App.css';
-import { Input } from './components/ui/input';
-import { Button } from './components/ui/button';
-import { Label } from './components/ui/label';
+import { Input, Button, Label } from './components/ui';
+import { z } from 'zod';
+import { useState } from 'react';
 
-interface FormValues {
+interface AccountDetails {
   accountName: string;
   accountBalance: string;
 }
+
+const accountSchema = z.object({
+  accountName: z.string().min(1, 'Account name is required'),
+  accountBalance: z
+    .string()
+    .min(1, 'Account balance is required')
+    .refine((value) => !isNaN(Number(value)), {
+      message: 'Account balance must be a number',
+    })
+    .transform((value) => Number(value)),
+});
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
     <>
       {field.state.meta.isTouched && !field.state.meta.isValid ? (
-        <em>{field.state.meta.errors.join(',')}</em>
+        <em className="text-slate-400">
+          {field.state.meta.errors?.[0]?.message}
+        </em>
       ) : null}
-      {field.state.meta.isValidating ? 'Validating...' : null}
     </>
   );
 }
 
 const App = () => {
-  const defaultValues: FormValues = {
+  const [accounts, setAccounts] = useState<AccountDetails[]>([]);
+
+  const defaultValues: AccountDetails = {
     accountName: '',
     accountBalance: '',
   };
@@ -29,7 +43,21 @@ const App = () => {
   const form = useForm({
     defaultValues: defaultValues,
     onSubmit: async ({ value }) => {
-      console.log('Form submitted with values:', value);
+      const parsed = accountSchema.safeParse(value);
+      if (parsed.success) {
+        setAccounts((prev) => [
+          ...prev,
+          {
+            accountName: parsed.data.accountName,
+            accountBalance: String(parsed.data.accountBalance),
+          },
+        ]);
+
+        form.reset();
+      }
+    },
+    validators: {
+      onChange: accountSchema,
     },
   });
 
@@ -39,7 +67,7 @@ const App = () => {
         Budgetary
       </h1>
 
-      <section className="gap-2">
+      <section>
         <h2 className="text-xl font-semibold text-slate-200">
           Add new account
         </h2>
@@ -56,16 +84,16 @@ const App = () => {
               children={(field) => {
                 return (
                   <>
-                    <Label className="p-2 text-slate-300" htmlFor={field.name}>
+                    <Label className="text-slate-300" htmlFor={field.name}>
                       Account Name:
                     </Label>
                     <Input
+                      className="bg-slate-300"
                       id={field.name}
                       name={field.name}
-                      value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      className="bg-slate-300"
+                      value={field.state.value}
                     />
                     <FieldInfo field={field} />
                   </>
@@ -79,16 +107,17 @@ const App = () => {
               children={(field) => {
                 return (
                   <>
-                    <Label className="p-2 text-slate-300" htmlFor={field.name}>
+                    <Label className="text-slate-300" htmlFor={field.name}>
                       Account Balance:
                     </Label>
                     <Input
+                      className="bg-slate-300"
                       id={field.name}
                       name={field.name}
-                      value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      className="bg-slate-300"
+                      type="number"
+                      value={field.state.value}
                     />
                     <FieldInfo field={field} />
                   </>
@@ -108,20 +137,26 @@ const App = () => {
                 >
                   {isSubmitting ? '...' : 'Add'}
                 </Button>
-                {/* <Button
-                  type="reset"
-                  onClick={(e) => {
-                    // Avoid unexpected resets of form elements (especially <select> elements)
-                    e.preventDefault();
-                    form.reset();
-                  }}
-                >
-                  Reset
-                </Button> */}
               </>
             )}
           />
         </form>
+      </section>
+      <section>
+        {accounts.length > 0 && (
+          <div className="mt-4">
+            <h2 className="text-xl font-semibold text-slate-200">
+              Accounts List
+            </h2>
+            <ul className="list-disc pl-5 text-slate-300">
+              {accounts.map((account, index) => (
+                <li key={index}>
+                  {account.accountName} - ${account.accountBalance}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
     </div>
   );
