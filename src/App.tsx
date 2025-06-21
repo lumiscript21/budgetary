@@ -28,7 +28,6 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
           {field.state.meta.errors?.[0]?.message}
         </em>
       ) : null}
-      {field.state.meta.isValidating ? 'Validating...' : null}
     </>
   );
 }
