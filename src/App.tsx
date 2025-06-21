@@ -3,17 +3,25 @@ import './App.css';
 import { Input } from './components/ui/input';
 import { Button } from './components/ui/button';
 import { Label } from './components/ui/label';
+import { z } from 'zod';
 
 interface FormValues {
   accountName: string;
   accountBalance: string;
 }
 
+const formSchema = z.object({
+  accountName: z.string().min(1, 'Account name is required'),
+  accountBalance: z.string().min(1, 'Account balance is required'),
+});
+
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
     <>
       {field.state.meta.isTouched && !field.state.meta.isValid ? (
-        <em>{field.state.meta.errors.join(',')}</em>
+        <em className="text-red-300">
+          {field.state.meta.errors?.[0]?.message}
+        </em>
       ) : null}
       {field.state.meta.isValidating ? 'Validating...' : null}
     </>
@@ -30,6 +38,9 @@ const App = () => {
     defaultValues: defaultValues,
     onSubmit: async ({ value }) => {
       console.log('Form submitted with values:', value);
+    },
+    validators: {
+      onChange: formSchema,
     },
   });
 
