@@ -5,12 +5,12 @@ import { Button } from './components/ui/button';
 import { Label } from './components/ui/label';
 import { z } from 'zod';
 
-interface FormValues {
+interface AccountDetails {
   accountName: string;
   accountBalance: string;
 }
 
-const formSchema = z.object({
+const accountSchema = z.object({
   accountName: z.string().min(1, 'Account name is required'),
   accountBalance: z
     .string()
@@ -35,7 +35,7 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 }
 
 const App = () => {
-  const defaultValues: FormValues = {
+  const defaultValues: AccountDetails = {
     accountName: '',
     accountBalance: '',
   };
@@ -43,11 +43,11 @@ const App = () => {
   const form = useForm({
     defaultValues: defaultValues,
     onSubmit: async ({ value }) => {
-      const parsed = formSchema.safeParse(value);
+      const parsed = accountSchema.safeParse(value);
       console.log('Form submitted with values:', parsed.data);
     },
     validators: {
-      onChange: formSchema,
+      onChange: accountSchema,
     },
   });
 
