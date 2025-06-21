@@ -40,4 +40,20 @@ describe('App', () => {
     expect(errors[0]).toHaveTextContent(/account name is required/i);
     expect(errors[1]).toHaveTextContent(/account balance is required/i);
   });
+
+  it('should create an entry on the page if the form was submitted with valid data', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    const accountNameInput = screen.getByLabelText(/account name/i);
+    const accountBalanceInput = screen.getByLabelText(/account balance/i);
+    const addButton = screen.getByRole('button', { name: /Add/i });
+
+    await user.type(accountNameInput, 'Test Account');
+    await user.type(accountBalanceInput, '1000');
+
+    await user.click(addButton);
+
+    expect(screen.getByText(/test account/i)).toBeInTheDocument();
+  });
 });

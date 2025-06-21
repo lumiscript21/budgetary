@@ -1,9 +1,8 @@
 import { useForm, type AnyFieldApi } from '@tanstack/react-form';
 import './App.css';
-import { Input } from './components/ui/input';
-import { Button } from './components/ui/button';
-import { Label } from './components/ui/label';
+import { Input, Button, Label } from './components/ui';
 import { z } from 'zod';
+import { useState } from 'react';
 
 interface AccountDetails {
   accountName: string;
@@ -35,6 +34,8 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 }
 
 const App = () => {
+  const [accounts, setAccounts] = useState<AccountDetails[]>([]);
+
   const defaultValues: AccountDetails = {
     accountName: '',
     accountBalance: '',
@@ -44,6 +45,15 @@ const App = () => {
     defaultValues: defaultValues,
     onSubmit: async ({ value }) => {
       const parsed = accountSchema.safeParse(value);
+      if (parsed.success) {
+        setAccounts((prev) => [
+          ...prev,
+          {
+            accountName: parsed.data.accountName,
+            accountBalance: String(parsed.data.accountBalance),
+          },
+        ]);
+      }
       console.log('Form submitted with values:', parsed.data);
     },
     validators: {
@@ -127,20 +137,26 @@ const App = () => {
                 >
                   {isSubmitting ? '...' : 'Add'}
                 </Button>
-                {/* <Button
-                  type="reset"
-                  onClick={(e) => {
-                    // Avoid unexpected resets of form elements (especially <select> elements)
-                    e.preventDefault();
-                    form.reset();
-                  }}
-                >
-                  Reset
-                </Button> */}
               </>
             )}
           />
         </form>
+      </section>
+      <section>
+        {accounts.length > 0 && (
+          <div className="mt-4">
+            <h2 className="text-xl font-semibold text-slate-200">
+              Accounts List
+            </h2>
+            <ul className="list-disc pl-5 text-slate-300">
+              {accounts.map((account, index) => (
+                <li key={index}>
+                  {account.accountName} - ${account.accountBalance}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
     </div>
   );
