@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import App from '../App';
@@ -57,6 +57,12 @@ describe('App', () => {
       expect(
         screen.queryByText(/balance is required/i),
       ).not.toBeInTheDocument();
+    });
+
+    it('should validate that the account balance is a number', async () => {
+      await user.type(accountBalance(), 'abc');
+
+      expect(screen.getByText(/balance must be a number/i)).toBeInTheDocument();
     });
 
     it('should clear the form fields after successful submission', async () => {

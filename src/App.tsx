@@ -116,7 +116,6 @@ const App = () => {
                       name={field.name}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      type="number"
                       value={field.state.value}
                     />
                     <FieldInfo field={field} />
