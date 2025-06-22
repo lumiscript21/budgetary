@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import App from '../App';
@@ -46,6 +46,19 @@ describe('App', () => {
       expect(errors[1]).toHaveTextContent(/account balance is required/i);
     });
 
+    it('should show validation errors only after a field has been touched, but is invalid', async () => {
+      accountName().focus();
+
+      await user.click(accountBalance());
+      await user.type(accountBalance(), '10');
+
+      expect(screen.getByText(/account name is required/i)).toBeInTheDocument();
+
+      expect(
+        screen.queryByText(/balance is required/i),
+      ).not.toBeInTheDocument();
+    });
+
     it('should clear the form fields after successful submission', async () => {
       await user.type(accountName(), 'Test Account');
       await user.type(accountBalance(), '1000');
@@ -66,5 +79,21 @@ describe('App', () => {
     await user.click(addButton());
 
     expect(screen.getByText(/test account/i)).toBeInTheDocument();
+  });
+
+  it('should tally up the total balance of all accounts and display it', async () => {
+    const user = userEvent.setup();
+
+    await user.type(accountName(), 'Account 1');
+    await user.type(accountBalance(), '1000');
+    await user.click(addButton());
+
+    expect(screen.getByText(/total balance: \$1,000/i)).toBeInTheDocument();
+
+    await user.type(accountName(), 'Account 2');
+    await user.type(accountBalance(), '2500');
+    await user.click(addButton());
+
+    expect(screen.getByText(/total balance: \$3,500/i)).toBeInTheDocument();
   });
 });

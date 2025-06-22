@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "release": "standard-version",
     "test": "vitest run --reporter verbose",
+    "test:watch": "vitest --reporter verbose",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -55,7 +56,6 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "eslint-plugin-storybook": "^9.0.12",
     "globals": "^16.0.0",
-    "happy-dom": "^18.0.1",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "playwright": "^1.53.1",

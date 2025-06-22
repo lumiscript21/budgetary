@@ -151,10 +151,28 @@ const App = () => {
             <ul className="list-disc pl-5 text-slate-300">
               {accounts.map((account, index) => (
                 <li key={index}>
-                  {account.accountName} - ${account.accountBalance}
+                  {account.accountName} -{' '}
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                  }).format(Number(account.accountBalance))}
                 </li>
               ))}
             </ul>
+            <section>
+              <h2 className="text-lg font-semibold text-slate-200">
+                Total Balance:{' '}
+                {new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                }).format(
+                  accounts.reduce(
+                    (total, account) => total + Number(account.accountBalance),
+                    0,
+                  ),
+                )}
+              </h2>
+            </section>
           </div>
         )}
       </section>
